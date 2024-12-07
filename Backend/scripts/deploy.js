@@ -1,27 +1,17 @@
-require('dotenv').config();
-const { ethers } = require('hardhat');
+const hre = require("hardhat");
 
-const main = async () => {
-    console.log("Deploying the contract...");
+async function main() {
+    const [deployer] = await hre.ethers.getSigners();
 
-    const contractFactory = await ethers.getContractFactory('MultiPriceDataConsumer');
+    console.log("Deploying contracts with the account:", deployer.address);
 
-    // Deploying the contract (Add constructor args here if needed)
-    const contract = await contractFactory.deploy();
-    await contract.deployed();
+    const TaskContract = await hre.ethers.getContractFactory("MultiPriceDataConsumer");
+    const taskContract = await TaskContract.deploy();
 
-    console.log("Contract deployed to:", contract.address);
-    console.log("Transaction hash:", contract.deploymentTransaction.hash);
-};
+    console.log("TaskContract deployed to:", taskContract.target);
+}
 
-const runMain = async () => {
-    try {
-        await main();
-        process.exit(0);
-    } catch (error) {
-        console.error("Error during deployment:", error);
-        process.exit(1);
-    }
-};
-
-runMain();
+main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+});
