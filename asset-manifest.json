@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/PriceConverter/static/css/main.581487d3.css",
+    "main.js": "/PriceConverter/static/js/main.9c36514d.js",
+    "static/js/488.e75445ad.chunk.js": "/PriceConverter/static/js/488.e75445ad.chunk.js",
+    "index.html": "/PriceConverter/index.html",
+    "main.581487d3.css.map": "/PriceConverter/static/css/main.581487d3.css.map",
+    "main.9c36514d.js.map": "/PriceConverter/static/js/main.9c36514d.js.map",
+    "488.e75445ad.chunk.js.map": "/PriceConverter/static/js/488.e75445ad.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.581487d3.css",
+    "static/js/main.9c36514d.js"
+  ]
+}
