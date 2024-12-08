@@ -52,6 +52,15 @@ const App = () => {
     connectWalletAndFetchPairs();
   }, []);
 
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    if (darkMode) {
+      htmlElement.classList.add("dark");
+    } else {
+      htmlElement.classList.remove("dark");
+    }
+  }, [darkMode]);
+
   const fetchPrice = async () => {
     if (!fromCurrency || !toCurrency) {
       alert("Please select both currencies.");
@@ -62,15 +71,17 @@ const App = () => {
     try {
       const contract = await getContract();
       if (contract) {
-        const price = await contract.getLatestPrice(pair); // Directly call the view function
-        setConversionResult(ethers.formatUnits(price, 8)); // Format result to a human-readable number
+        const price = await contract.getLatestPrice(pair);
+        setConversionResult({
+          pair,
+          price: parseFloat(ethers.formatUnits(price, 8)).toFixed(4),
+        });
       }
     } catch (error) {
       console.error("Error fetching price:", error);
       alert("Failed to fetch price. Ensure MetaMask is connected.");
     }
   };
-
 
   const currencyIcons = {
     BTC: <FaBitcoin className="text-yellow-500" />,
@@ -80,23 +91,27 @@ const App = () => {
   };
 
   return (
-    <main className={`${darkMode ? "dark" : ""} bg-gray-100 dark:bg-gray-900 min-h-screen`}>
+    <main className="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
       <button
         onClick={() => setDarkMode((prev) => !prev)}
-        className="absolute top-4 right-4 bg-gray-200 dark:bg-gray-700 p-2 rounded-full shadow-md"
+        className="absolute top-4 right-4 bg-gray-200 dark:bg-blue-700 p-2 rounded-full shadow-md"
       >
         {darkMode ? <BsSun className="text-yellow-500" /> : <BsMoon className="text-gray-800" />}
       </button>
       <div className="flex items-center justify-center flex-col gap-8 min-h-screen">
+        {/* Heading */}
         <section className="p-4 rounded-lg font-bold text-3xl text-center flex items-center gap-3">
           <SiChainlink className="text-blue-700 text-4xl" />
           <div>
-            <h1 className="pb-2 border-b-4 border-blue-700 text-blue-700">Chainlink Price Converter</h1>
+            <h1 className="pb-2 border-b-4 border-blue-700 text-blue-700 dark:text-blue-400">
+              Chainlink Price Converter
+            </h1>
             <p className="text-gray-600 text-lg mt-2 dark:text-gray-300">
               Fetch real-time price conversions using Chainlink data feeds.
             </p>
           </div>
         </section>
+        {/* Currencies */}
         <section className="bg-white dark:bg-gray-800 shadow-lg p-6 rounded-lg w-80 flex flex-col items-center gap-4">
           <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Select Currencies</h2>
           <div className="flex items-center gap-3 w-full">
@@ -132,9 +147,12 @@ const App = () => {
             Convert
           </button>
         </section>
-        <section className="bg-green-100 text-green-700 p-4 rounded-lg w-80 shadow dark:bg-green-900 dark:text-green-300">
+        {/* Result */}
+        <section className="bg-green-300 text-blue-800 p-4 rounded-lg w-80 shadow dark:bg-green-900 dark:text-green-300">
           {conversionResult ? (
-            <p className="text-center text-lg font-semibold">{conversionResult}</p>
+            <p className="text-center text-lg font-semibold">
+              {conversionResult.pair} → {conversionResult.price}
+            </p>
           ) : (
             <p className="text-center text-gray-500 dark:text-gray-400">
               Select currencies to see the result here.
