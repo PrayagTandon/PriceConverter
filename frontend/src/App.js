@@ -12,47 +12,32 @@ const App = () => {
   const [supportedPairs, setSupportedPairs] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
 
+  const fromCurrencies = ["BTC", "ETH", "LINK", "EUR"];
+  const toCurrencies = ["ETH", "USD"];
+
   const getContract = async () => {
     if (!window.ethereum) {
       alert("MetaMask is not detected. Please install MetaMask to use this app.");
       return null;
     }
-    const provider = new ethers.BrowserProvider(window.ethereum); // Updated for ethers v6+
+    const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
     return new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
   };
 
-  const fetchSupportedPairs = async () => {
-    try {
-      const contract = await getContract();
-      if (contract) {
-        const pairs = await contract.getSupportedPairs();
-        setSupportedPairs(pairs);
-      }
-    } catch (error) {
-      console.error("Error fetching supported pairs:", error);
-    }
-  };
-
-  const fetchPrice = async () => {
-    if (!fromCurrency || !toCurrency) {
-      alert("Please select both currencies.");
-      return;
-    }
-    const pair = `${fromCurrency}/${toCurrency}`;
-    try {
-      const contract = await getContract();
-      if (contract) {
-        const price = await contract.getLatestPrice(pair);
-        setConversionResult(ethers.formatUnits(price, 8)); // Updated for ethers v6+
-      }
-    } catch (error) {
-      console.error("Error fetching price:", error);
-      alert("Failed to fetch price. Ensure MetaMask is connected.");
-    }
-  };
-
   useEffect(() => {
+    const fetchSupportedPairs = async () => {
+      try {
+        const contract = await getContract();
+        if (contract) {
+          const pairs = await contract.getSupportedPairs();
+          setSupportedPairs(pairs);
+        }
+      } catch (error) {
+        console.error("Error fetching supported pairs:", error);
+      }
+    };
+
     const connectWalletAndFetchPairs = async () => {
       try {
         if (window.ethereum) {
@@ -67,10 +52,30 @@ const App = () => {
     connectWalletAndFetchPairs();
   }, []);
 
+  const fetchPrice = async () => {
+    if (!fromCurrency || !toCurrency) {
+      alert("Please select both currencies.");
+      return;
+    }
+
+    const pair = `${fromCurrency}/${toCurrency}`;
+    try {
+      const contract = await getContract();
+      if (contract) {
+        const price = await contract.getLatestPrice(pair); // Directly call the view function
+        setConversionResult(ethers.formatUnits(price, 8)); // Format result to a human-readable number
+      }
+    } catch (error) {
+      console.error("Error fetching price:", error);
+      alert("Failed to fetch price. Ensure MetaMask is connected.");
+    }
+  };
+
+
   const currencyIcons = {
     BTC: <FaBitcoin className="text-yellow-500" />,
     ETH: <FaEthereum className="text-blue-600" />,
-    USD: <FaDollarSign className="text-green-500" />,
+    LINK: <FaDollarSign className="text-green-500" />,
     EUR: <FaEuroSign className="text-gray-500" />,
   };
 
@@ -101,13 +106,9 @@ const App = () => {
               onChange={(e) => setFromCurrency(e.target.value)}
               className="w-full p-3 border rounded-lg text-gray-700 dark:bg-gray-700 dark:text-white"
             >
-              <option value="" disabled>
-                Select From Currency
-              </option>
-              {supportedPairs.map((pair) => (
-                <option key={pair} value={pair.split("/")[0]}>
-                  {pair.split("/")[0]}
-                </option>
+              <option value="" disabled>Select From Currency</option>
+              {fromCurrencies.map((currency) => (
+                <option key={currency} value={currency}>{currency}</option>
               ))}
             </select>
           </div>
@@ -118,13 +119,9 @@ const App = () => {
               onChange={(e) => setToCurrency(e.target.value)}
               className="w-full p-3 border rounded-lg text-gray-700 dark:bg-gray-700 dark:text-white"
             >
-              <option value="" disabled>
-                Select To Currency
-              </option>
-              {supportedPairs.map((pair) => (
-                <option key={pair} value={pair.split("/")[1]}>
-                  {pair.split("/")[1]}
-                </option>
+              <option value="" disabled>Select To Currency</option>
+              {toCurrencies.map((currency) => (
+                <option key={currency} value={currency}>{currency}</option>
               ))}
             </select>
           </div>
