@@ -16,36 +16,17 @@ contract MultiPriceDataConsumer {
         addPair("EUR/USD", 0x1a81afB8146aeFfCFc5E50e8479e826E7D55b910);
     }
 
-    // function getLatestPrice(string memory pair) external view returns (int) {
-    //     require(address(dataFeeds[pair]) != address(0), "Pair not supported");
-    //     (
-    //         /* uint80 roundID */,
-    //         int price,
-    //         /* uint startedAt */,
-    //         /* uint timeStamp */,
-    //         /* uint80 answeredInRound */
-    //     ) = dataFeeds[pair].latestRoundData();
-    //     return price;
-    // }
-
-    function getLatestPriceWithLog(string memory pair) external returns (int) {
-    require(address(dataFeeds[pair]) != address(0), "Pair not supported");
-    (
-        /* uint80 roundID */,
-        int price,
-        /* uint startedAt */,
-        /* uint timeStamp */,
-        /* uint80 answeredInRound */
-    ) = dataFeeds[pair].latestRoundData();
-
-    // Emit an event to log the request
-    emit PriceRetrieved(pair, price, msg.sender);
-
-    return price;
-}
-
-event PriceRetrieved(string pair, int price, address indexed requester);
-
+    function getLatestPrice(string memory pair) external view returns (int) {
+        require(address(dataFeeds[pair]) != address(0), "Pair not supported");
+        (
+            /* uint80 roundID */,
+            int price,
+            /* uint startedAt */,
+            /* uint timeStamp */,
+            /* uint80 answeredInRound */
+        ) = dataFeeds[pair].latestRoundData();
+        return price;
+    }
 
     function addPair(string memory pair, address aggregatorAddress) public {
         require(aggregatorAddress != address(0), "Invalid aggregator address");
